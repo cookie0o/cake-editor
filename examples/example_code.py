@@ -1,4 +1,4 @@
-example_code = ("""\
+example_codePY = ("""\
 # imports
 from requests import get
 import socket
@@ -26,4 +26,16 @@ def get_ip():
             print ("GET IP ERROR:")
             return error
 ...
+""")
+
+example_codeJ  = ("""\
+class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!"); 
+    }
+}
+""")
+
+example_codeLua  = ("""\
+print "Hello, World!"
 """)

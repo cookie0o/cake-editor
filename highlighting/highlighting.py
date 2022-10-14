@@ -1,13 +1,36 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import configparser
+import os
 
-def format(color, style=''):
+upper_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+
+
+settings = upper_dir+"/settings/config.ini"
+config = configparser.ConfigParser()
+config.read(settings)
+## set button colors
+KeywordColorChnage = (config.get('-color-', 'KeywordColorChnage').replace(",", " ").split())
+OperatorColorChnage = (config.get('-color-', 'OperatorColorChnage').replace(",", " ").split())
+BraceColorChnage = (config.get('-color-', 'BraceColorChnage').replace(",", " ").split())
+DefClassColorChnage = (config.get('-color-', 'DefClassColorChnage').replace(",", " ").split())
+StringColorChnage = (config.get('-color-', 'StringColorChnage').replace(",", " ").split())
+String2ColorChnage = (config.get('-color-', 'String2ColorChnage').replace(",", " ").split())
+CommentColorChnage = (config.get('-color-', 'CommentColorChnage').replace(",", " ").split())
+SelfColorChnage = (config.get('-color-', 'SelfColorChnage').replace(",", " ").split())
+NummbersColorChnage = (config.get('-color-', 'NummbersColorChnage').replace(",", " ").split())
+language = (config.get('-settings-', 'language'))
+
+
+
+
+def format(color, style):
     """
     Return a QTextCharFormat with the given attributes.
     """
     _color = QColor()
     if type(color) is not str:
-        _color.setRgb(color[0], color[1], color[2])
+        _color.setRgb(int(color[0]), int(color[1]), int(color[2]))
     else:
         _color.setNamedColor(color)
 
@@ -26,34 +49,24 @@ def format(color, style=''):
 # Syntax styles that can be shared by all languages
 
 STYLES = {
-    'keyword': format([0, 255, 0], 'bold'),
-    'operator': format([150, 150, 150]),
-    'brace': format('darkGray'),
-    'defclass': format([255, 255, 204], 'bold'),
-    'string': format([51, 255, 255]),
-    'string2': format([30, 120, 110]),
-    'comment': format([128, 128, 128]),
-    'self': format([255, 0, 255], 'italic'),
-    'numbers': format([0, 204, 102]),
+    'keyword': format(KeywordColorChnage, ""),
+    'operator': format(OperatorColorChnage, ""),
+    'brace': format(BraceColorChnage, ""),
+    'defclass': format(DefClassColorChnage, ""),
+    'string': format(StringColorChnage, ""),
+    'string2': format(String2ColorChnage, ""),
+    'comment': format(CommentColorChnage, ""),
+    'self': format(SelfColorChnage, ""),
+    'numbers': format(NummbersColorChnage, ""),
 }
 
 
 class PythonHighlighter(QSyntaxHighlighter):
-    """Syntax highlighter for the Python language.
-    """
-    # Python keywords
 
+    # keywords
+    from highlighting.keywords import keywordsPY, keywordsJ, keywordsLua
 
-    keywords = [
-        'and', 'assert', 'break', 'class', 'continue', 'def',
-        'del', 'elif', 'else', 'except', 'exec', 'finally',
-        'for', 'from', 'global', 'if', 'import', 'in',
-        'is', 'lambda', 'not', 'or', 'pass', 'print',
-        'raise', 'return', 'try', 'while', 'yield',
-        'None', 'True', 'False', 'range',
-    ]
-
-    # Python operators
+    # operators
     operators = [
         '=',
         # Comparison
@@ -66,7 +79,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         '\^', '\|', '\&', '\~', '>>', '<<',
     ]
 
-    # Python braces
+    # braces
     braces = [
         '\{', '\}', '\(', '\)', '\[', '\]',
     ]
@@ -83,12 +96,21 @@ class PythonHighlighter(QSyntaxHighlighter):
         rules = []
 
         # Keyword, operator, and brace rules
-        rules += [(r'\b%s\b' % w, 0, STYLES['keyword'])
-                  for w in PythonHighlighter.keywords]
+        if language == "Python":
+            rules += [(r'\b%s\b' % w, 0, STYLES['keyword'])
+                    for w in PythonHighlighter.keywordsPY]
+        elif language == "Java":
+            rules += [(r'\b%s\b' % w, 0, STYLES['keyword'])
+                    for w in PythonHighlighter.keywordsJ]
+        elif language == "Lua":     
+            rules += [(r'\b%s\b' % w, 0, STYLES['keyword'])
+                    for w in PythonHighlighter.keywordsLua]
+
+        #
         rules += [(r'%s' % o, 0, STYLES['operator'])
-                  for o in PythonHighlighter.operators]
+                for o in PythonHighlighter.operators]
         rules += [(r'%s' % b, 0, STYLES['brace'])
-                  for b in PythonHighlighter.braces]
+                for b in PythonHighlighter.braces]
 
         # All other rules
         rules += [
@@ -140,12 +162,7 @@ class PythonHighlighter(QSyntaxHighlighter):
             in_multiline = self.match_multiline(text, *self.tri_double)
 
     def match_multiline(self, text, delimiter, in_state, style):
-        """Do highlighting of multi-line strings. ``delimiter`` should be a
-        ``QRegExp`` for triple-single-quotes or triple-double-quotes, and
-        ``in_state`` should be a unique integer to represent the corresponding
-        state changes when inside those strings. Returns True if we're still
-        inside a multi-line string when this function is finished.
-        """
+
         # If inside triple-single quotes, start at 0
         if self.previousBlockState() == in_state:
             start = 0

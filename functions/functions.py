@@ -1,18 +1,46 @@
-from PyQt5.QtWidgets import QInputDialog, QFileDialog, QCompleter
+from PyQt5.QtWidgets import QInputDialog, QFileDialog, QMessageBox, QColorDialog
 from qt_material import apply_stylesheet
 import configparser
 import keyboard
 import time
 import os
 
+# import example code
+from examples.example_code import *
+
 # upper dir
 upper_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 
 # error or info message I dont know why you ask me read the code
 def msg(self, text):
+    msg = QMessageBox()
     msg.setIcon(QMessageBox.Critical)
-    msg.setText("information / error")
-    msg.setWindowTitle(text)
+    msg.setWindowTitle("information / error")
+    msg.setText(str(text))
+    msg.exec_()
+    return
+
+# color changing wheel
+def SelectColor(self, Button):
+    color = QColorDialog.getColor()
+    if Button == "KeywordColorChnage_btn":
+        self.KeywordColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "NummbersColorChnage_btn":
+        self.NummbersColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "BraceColorChnage_btn": 
+        self.BraceColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "DefClassColorChnage_btn":
+        self.DefClassColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "StringColorChnage_btn":
+        self.StringColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "String2ColorChnage_btn":
+        self.String2ColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "CommentColorChnage_btn":
+        self.CommentColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "SelfColorChnage_btn":
+        self.SelfColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
+    elif Button == "OperatorColorChnage_btn":
+        self.OperatorColorChnage_btn.setStyleSheet("background-color: rgb(" + str(color.red()) + ", " + str(color.green()) + ", " + str(color.blue()) + ");")
     return
 
 # save file
@@ -21,7 +49,13 @@ def Save_file(MainWindow, self):
         title = MainWindow.windowTitle()
         title = title.replace("CAKE-EDITOR - ", "")
         if title == "":
-            fileName, _ = QFileDialog.getSaveFileName(MainWindow, "Save Code File", "", "Python (*.py)")
+            if self.CodeLanguage_comboBox.currentText() == "Python":
+                fileName, _ = QFileDialog.getSaveFileName(MainWindow, "Save Code File", "", "Python (*.py)")
+            elif self.CodeLanguage_comboBox.currentText() == "java":
+                fileName, _ = QFileDialog.getSaveFileName(MainWindow, "Save Code File", "", "Java (*.java)")
+            elif self.CodeLanguage_comboBox.currentText() == "Lua":
+                fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Save Code File", "", "Lua (*.lua)") 
+
             if fileName:
                 path = str(fileName)
             else:
@@ -47,7 +81,12 @@ def Save_file(MainWindow, self):
 # open file
 def Open_file(MainWindow, self):
     try:
-        fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Open Code File", "", "Python (*.py)")  
+        if self.CodeLanguage_comboBox.currentText() == "Python":
+            fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Open Code File", "", "Python (*.py)") 
+        elif self.CodeLanguage_comboBox.currentText() == "Java":
+            fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Open Code File", "", "Java (*.java)")  
+        elif self.CodeLanguage_comboBox.currentText() == "Lua":
+            fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Open Code File", "", "Lua (*.lua)") 
         if fileName:
             path = str(fileName)
         else:
@@ -75,15 +114,15 @@ def Auto_indent(self):
         msg(self, e)
 
 # get python.exe location
-def GetPythonLocation(MainWindow, self):
+def GetCompilerLocation(MainWindow, self):
     try:
-        fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Find Python", "", "Exec. (*.exe)")  
+        fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Find Language Compiler", "", "Exec. (*.exe)")  
         if fileName:
             path = str(fileName)
         else:
             return
         # save path
-        self.PythonPathlineEdit.setText(fileName)
+        self.LanguagePathlineEdit.setText(fileName)
         return
     except Exception as e:
         msg(self, e)
@@ -94,8 +133,15 @@ def RunCode(MainWindow, self):
         title = MainWindow.windowTitle()
         title = title.replace("CAKE-EDITOR - ", "")
         if title == "":
-            TempCode = upper_dir+"/temp/code.py"
-            PythonLocation = str(self.PythonPathlineEdit.text())
+            if self.CodeLanguage_comboBox.currentText() == "Python":
+                TempCode = upper_dir+"/temp/code.py"
+            elif self.CodeLanguage_comboBox.currentText() == "Java":
+                TempCode = upper_dir+"/temp/code.java"
+            elif self.CodeLanguage_comboBox.currentText() == "Lua":
+                TempCode = upper_dir+"/temp/code.lua"
+
+            timer = upper_dir+"/functions/time.bat"
+            LanguageLocation = str(self.LanguagePathlineEdit.text())
             #get code
             code = self.CodeEditor_plainTextEdit.toPlainText()
             # save code in a temp file.
@@ -103,16 +149,45 @@ def RunCode(MainWindow, self):
                 file.write(code)
             file.close()
             #run code in cmd
-            os.system(f'start cmd.exe /k "{PythonLocation} {TempCode} pause"')
+            os.system(f"""\
+start cmd.exe /k {timer} {LanguageLocation} {TempCode}
+""")
             return 
         else:
-            PythonLocation = str(self.PythonPathlineEdit.text())
+            timer = upper_dir+"/functions/time.bat"
+            LanguageLocation = str(self.PythonPathlineEdit.text())
             #run code in cmd
-            os.system(f'start cmd.exe /k "{PythonLocation} {title} pause"')
+            os.system(f'start cmd.exe /k {timer} {languageLocation} {title} pause')
             return
     except Exception as e:
         msg(self, e)
+
+# show hide dockWidget
+def ShowHide_dockWidget(MainWindow,self):
+    if self.dockWidget.isHidden():
+        self.dockWidget.show()
+        return
+    else:
+        self.dockWidget.hide()
+        return
     
+# reset Syntax color
+def ResetSyntaxColor(MainWindow,self):
+    try:
+        self.KeywordColorChnage_btn.setStyleSheet(f"background-color: rgb(0, 255, 0);")
+        self.OperatorColorChnage_btn.setStyleSheet(f"background-color: rgb(150, 150, 150);")
+        self.BraceColorChnage_btn.setStyleSheet(f"background-color: rgb(93, 92, 91);")
+        self.DefClassColorChnage_btn.setStyleSheet(f"background-color: rgb(255, 255, 204);")
+        self.StringColorChnage_btn.setStyleSheet(f"background-color: rgb(51, 255, 255);")
+        self.String2ColorChnage_btn.setStyleSheet(f"background-color: rgb(30, 120, 110);")
+        self.CommentColorChnage_btn.setStyleSheet(f"background-color: rgb(128, 128, 128);")
+        self.SelfColorChnage_btn.setStyleSheet(f"background-color: rgb(255, 0, 255);")
+        self.NummbersColorChnage_btn.setStyleSheet(f"background-color: rgb(0, 204, 102);")
+        return
+    except Exception as e:
+        msg(self, e) 
+
+
 
 
 # SETTINGS
@@ -129,7 +204,23 @@ def Save_settings(MainWindow, self):
         config['-settings-']['theme'] = str(self.Themes_comboBox.currentText().replace("-", "_"))
         config['-settings-']['language'] = str(self.CodeLanguage_comboBox.currentText())
         config['-settings-']['AutoIndent'] = str(Autoindent)
-        config['-settings-']['PythonPath'] = str(self.PythonPathlineEdit.text())
+        if self.CodeLanguage_comboBox.currentText() == "Python" and self.label_4.text() == "Python.exe location":
+            config['-settings-']['PythonPath'] = str(self.LanguagePathlineEdit.text())
+        elif self.CodeLanguage_comboBox.currentText() == "Java" and self.label_4.text() == "Java.exe location":
+            config['-settings-']['JavaPath'] = str(self.LanguagePathlineEdit.text())
+        elif self.CodeLanguage_comboBox.currentText() == "Lua" and self.label_4.text() == "Lua.exe location":
+            config['-settings-']['LuaPath'] = str(self.LanguagePathlineEdit.text())
+
+        ## color buttons
+        config['-color-']['KeywordColorChnage'] = str(self.KeywordColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['OperatorColorChnage'] = str(self.OperatorColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['BraceColorChnage'] = str(self.BraceColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['DefClassColorChnage'] = str(self.DefClassColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['StringColorChnage'] = str(self.StringColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['String2ColorChnage'] = str(self.String2ColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['CommentColorChnage'] = str(self.CommentColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['SelfColorChnage'] = str(self.SelfColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
+        config['-color-']['NummbersColorChnage'] = str(self.NummbersColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
         # save settings
         with open(settings, 'w') as file: # save
             config.write(file)
@@ -138,6 +229,8 @@ def Save_settings(MainWindow, self):
         user_theme = self.Themes_comboBox.currentText().replace("-", "_")
         # apply selected theme
         apply_stylesheet(MainWindow, theme=upper_dir+"/themes/"+user_theme+".xml")
+        # show info that some changes may apply after a restart
+        msg(self, "Some settings will be applied after restarting the program")
         return
     except Exception as e:
         msg(self, e)
@@ -153,20 +246,55 @@ def Load_settings(MainWindow, self):
         language = config.get('-settings-', 'language')
         Autoindent = config.get('-settings-', 'AutoIndent')
         PythonPath = config.get('-settings-', 'PythonPath')
+        JavaPath = config.get('-settings-', 'JavaPath')
+        LuaPath = config.get('-settings-', 'LuaPath')
         if Autoindent == "True":
             Autoindent = True
         else:
             Autoindent = False
         # apply settings
         # theme
-        self.Themes_comboBox.setCurrentText(theme)
         apply_stylesheet(MainWindow, theme=upper_dir+"/themes/"+theme+".xml")
+        self.Themes_comboBox.setCurrentText((theme.replace(".xml", "").replace("_", "-")))
         # coding language
         self.CodeLanguage_comboBox.setCurrentText(language)
         # auto Indent
         self.AutoIndent_checkBox.setChecked(Autoindent)
-        # python path
-        self.PythonPathlineEdit.setText(PythonPath)
+        # set text- background
+        self.LanguagePathlineEdit.setText(" ")
+        if language == "Python":
+            self.label_4.setText("Python.exe location")
+            self.LanguagePathlineEdit.setText(PythonPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codePY)
+        elif language == "Java":
+            self.label_4.setText("Java.exe location")
+            self.LanguagePathlineEdit.setText(JavaPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codeJ)
+        elif language == "Lua":
+            self.label_4.setText("Lua.exe location")
+            self.LanguagePathlineEdit.setText(LuaPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codeLua)
+
+        ## get button colors
+        KeywordColorChnage = config.get('-color-', 'KeywordColorChnage')
+        OperatorColorChnage = config.get('-color-', 'OperatorColorChnage')
+        BraceColorChnage = config.get('-color-', 'BraceColorChnage')
+        DefClassColorChnage = config.get('-color-', 'DefClassColorChnage')
+        StringColorChnage = config.get('-color-', 'StringColorChnage')
+        String2ColorChnage = config.get('-color-', 'String2ColorChnage')
+        CommentColorChnage = config.get('-color-', 'CommentColorChnage')
+        SelfColorChnage = config.get('-color-', 'SelfColorChnage')
+        NummbersColorChnage = config.get('-color-', 'NummbersColorChnage')
+        ## set button colors
+        self.KeywordColorChnage_btn.setStyleSheet(f"background-color: rgb({KeywordColorChnage});")
+        self.OperatorColorChnage_btn.setStyleSheet(f"background-color: rgb({OperatorColorChnage});")
+        self.BraceColorChnage_btn.setStyleSheet(f"background-color: rgb({BraceColorChnage});")
+        self.DefClassColorChnage_btn.setStyleSheet(f"background-color: rgb({DefClassColorChnage});")
+        self.StringColorChnage_btn.setStyleSheet(f"background-color: rgb({StringColorChnage});")
+        self.String2ColorChnage_btn.setStyleSheet(f"background-color: rgb({String2ColorChnage});")
+        self.CommentColorChnage_btn.setStyleSheet(f"background-color: rgb({CommentColorChnage});")
+        self.SelfColorChnage_btn.setStyleSheet(f"background-color: rgb({SelfColorChnage});")
+        self.NummbersColorChnage_btn.setStyleSheet(f"background-color: rgb({NummbersColorChnage});")
         return
     except Exception as e:
         msg(self, e)
