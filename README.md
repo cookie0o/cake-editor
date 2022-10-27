@@ -1,6 +1,6 @@
 <div align=center>
 
-  # CAKE-EDITOR [v0.2]
+  # CAKE-EDITOR [v0.3]
   **⚠️- Multi language IDE with many features -⚠️** 
   
 </div>
