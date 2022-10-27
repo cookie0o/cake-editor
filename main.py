@@ -247,8 +247,6 @@ class Ui_MainWindow(object):
         # load settings
         Load_settings(MainWindow, self)
 
-
-
         # button actions
         class BTN_actions():
             # open file button

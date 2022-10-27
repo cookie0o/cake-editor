@@ -118,7 +118,7 @@ def GetCompilerLocation(MainWindow, self):
     try:
         fileName, _ = QFileDialog.getOpenFileName(MainWindow, "Find Language Compiler", "", "Exec. (*.exe)")  
         if fileName:
-            path = str(fileName)
+            pass
         else:
             return
         # save path
@@ -155,9 +155,9 @@ start cmd.exe /k {timer} {LanguageLocation} {TempCode}
             return 
         else:
             timer = upper_dir+"/functions/time.bat"
-            LanguageLocation = str(self.PythonPathlineEdit.text())
+            LanguageLocation = str(self.LanguagePathlineEdit.text())
             #run code in cmd
-            os.system(f'start cmd.exe /k {timer} {languageLocation} {title} pause')
+            os.system(f'start cmd.exe /k {timer} {LanguageLocation} {title} pause')
             return
     except Exception as e:
         msg(self, e)
@@ -193,7 +193,7 @@ def ResetSyntaxColor(MainWindow,self):
 # SETTINGS
 # apply settings
 def Save_settings(MainWindow, self):
-    try:
+    #try:
         settings = upper_dir+"/settings/config.ini"
         config = configparser.ConfigParser()
         config.read(settings)
@@ -204,12 +204,18 @@ def Save_settings(MainWindow, self):
         config['-settings-']['theme'] = str(self.Themes_comboBox.currentText().replace("-", "_"))
         config['-settings-']['language'] = str(self.CodeLanguage_comboBox.currentText())
         config['-settings-']['AutoIndent'] = str(Autoindent)
-        if self.CodeLanguage_comboBox.currentText() == "Python" and self.label_4.text() == "Python.exe location":
-            config['-settings-']['PythonPath'] = str(self.LanguagePathlineEdit.text())
-        elif self.CodeLanguage_comboBox.currentText() == "Java" and self.label_4.text() == "Java.exe location":
-            config['-settings-']['JavaPath'] = str(self.LanguagePathlineEdit.text())
-        elif self.CodeLanguage_comboBox.currentText() == "Lua" and self.label_4.text() == "Lua.exe location":
-            config['-settings-']['LuaPath'] = str(self.LanguagePathlineEdit.text())
+        if self.CodeLanguage_comboBox.currentText() == "Python":
+            language = "Python"
+            if self.label_4.text() == "Python.exe location":
+                config['-settings-']['PythonPath'] = str(self.LanguagePathlineEdit.text())
+        elif self.CodeLanguage_comboBox.currentText() == "Java":
+            language = "Java"
+            if self.label_4.text() == "Java.exe location":
+                config['-settings-']['JavaPath'] = str(self.LanguagePathlineEdit.text())
+        elif self.CodeLanguage_comboBox.currentText() == "Lua":
+            language = "Lua"
+            if self.label_4.text() == "Lua.exe location":
+                config['-settings-']['LuaPath'] = str(self.LanguagePathlineEdit.text())
 
         ## color buttons
         config['-color-']['KeywordColorChnage'] = str(self.KeywordColorChnage_btn.palette().button().color().getRgb()).replace(", 255)", "").replace("(","")
@@ -224,16 +230,29 @@ def Save_settings(MainWindow, self):
         # save settings
         with open(settings, 'w') as file: # save
             config.write(file)
-        # apply settings
         # get theme
         user_theme = self.Themes_comboBox.currentText().replace("-", "_")
-        # apply selected theme
+        # get paths
+        PythonPath = config.get('-settings-', 'PythonPath')
+        JavaPath = config.get('-settings-', 'JavaPath')
+        LuaPath = config.get('-settings-', 'LuaPath')
+        # apply text, theme, ...
         apply_stylesheet(MainWindow, theme=upper_dir+"/themes/"+user_theme+".xml")
-        # show info that some changes may apply after a restart
-        msg(self, "Some settings will be applied after restarting the program")
+        if language == "Python":
+            self.label_4.setText("Python.exe location")
+            self.LanguagePathlineEdit.setText(PythonPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codePY)
+        elif language == "Java":
+            self.label_4.setText("Java.exe location")
+            self.LanguagePathlineEdit.setText(JavaPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codeJ)
+        elif language == "Lua":
+            self.label_4.setText("Lua.exe location")
+            self.LanguagePathlineEdit.setText(LuaPath)
+            self.CodeEditor_plainTextEdit.setPlaceholderText(example_codeLua)
         return
-    except Exception as e:
-        msg(self, e)
+    #except Exception as e:
+    #    msg(self, e)
 
 
 def Load_settings(MainWindow, self):
@@ -254,6 +273,11 @@ def Load_settings(MainWindow, self):
             Autoindent = False
         # apply settings
         # theme
+        # set background image
+        self.CodeEditor_plainTextEdit.setStyleSheet("""
+            background-image: url("C:/Users/juerg/Desktop/cake-editor-develop/cake-editor/res/bg.png"); 
+            background-position: center;
+        """)
         apply_stylesheet(MainWindow, theme=upper_dir+"/themes/"+theme+".xml")
         self.Themes_comboBox.setCurrentText((theme.replace(".xml", "").replace("_", "-")))
         # coding language
