@@ -1,6 +1,6 @@
 <div align=center>
 
-  # CAKE-EDITOR [v0.3]
+  # CAKE-EDITOR [v0.4]
   **⚠️- Multi language IDE with many features -⚠️** 
   
 </div>
@@ -10,4 +10,5 @@
 - Syntax highlighting
 - Themes
 
-![image](https://user-images.githubusercontent.com/81589649/194765355-78e83e11-e751-4590-8e24-20744b3158fe.png)
+![image](https://user-images.githubusercontent.com/81589649/200629893-982f3997-7a4a-4d15-9385-81022f1c5c34.png)
+
