@@ -109,7 +109,6 @@ def Auto_indent(self):
     try:
         if self.CodeEditor_plainTextEdit.toPlainText().endswith(':\n') and self.AutoIndent_checkBox.isChecked():
             self.CodeEditor_plainTextEdit.insertPlainText('    ')
-        return
     except Exception as e:
         msg(self, e)
 
@@ -273,11 +272,6 @@ def Load_settings(MainWindow, self):
             Autoindent = False
         # apply settings
         # theme
-        # set background image
-        self.CodeEditor_plainTextEdit.setStyleSheet("""
-            background-image: url("C:/Users/juerg/Desktop/cake-editor-develop/cake-editor/res/bg.png"); 
-            background-position: center;
-        """)
         apply_stylesheet(MainWindow, theme=upper_dir+"/themes/"+theme+".xml")
         self.Themes_comboBox.setCurrentText((theme.replace(".xml", "").replace("_", "-")))
         # coding language

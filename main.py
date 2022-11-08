@@ -23,9 +23,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setWindowIcon(QIcon(current_dir+"/res/ico.ico"))
         # set size and lock it
-        MainWindow.resize(870, 480)
-        MainWindow.setMinimumSize(870, 480)
-        MainWindow.setMaximumSize(870, 480)
+        MainWindow.resize(860, 480)
+        MainWindow.setMinimumSize(860, 480)
+        MainWindow.setMaximumSize(860, 480)
         font = QtGui.QFont()
         # Ui content
         self.SaveFile_btn = QtWidgets.QPushButton(MainWindow)
@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         self.NummbersColorChnage_btn.setText("")
         self.NummbersColorChnage_btn.setObjectName("NummbersColorChnage_btn")
         self.label_24 = QtWidgets.QLabel(self.dockWidgetContents)
-        self.label_24.setGeometry(QtCore.QRect(100, 0, 80, 20))
+        self.label_24.setGeometry(QtCore.QRect(100, 0, 60, 20))
         font.setPointSize(10)
         self.label_24.setFont(font)
         self.label_24.setObjectName("label_24")
@@ -291,7 +291,7 @@ class Ui_MainWindow(object):
         self.Save_btn.setText(_translate("MainWindow", "Save"))
         self.Back_btn.setText(_translate("MainWindow", "Back"))
         self.Reset_btn.setText(_translate("MainWindow", "Reset"))
-        #####
+        ##### btn desc.
         self.label_15.setText(_translate("MainWindow", "keyword"))
         self.label_24.setText(_translate("MainWindow", "operator"))
         self.label_17.setText(_translate("MainWindow", "brace"))
@@ -301,6 +301,12 @@ class Ui_MainWindow(object):
         self.label_21.setText(_translate("MainWindow", "string2"))
         self.label_22.setText(_translate("MainWindow", "string"))
         self.label_23.setText(_translate("MainWindow", "defclass"))
+        ##### btn tooltips
+        self.OpenFile_btn.setToolTip("Open file in editor")
+        self.SaveFile_btn.setToolTip("Save current Code/File")
+        self.Settings_btn.setToolTip("Change IDE settings")
+        self.Run_btn.setToolTip("Run current Code/File")
+
 
 # Run Ui
 if __name__ == "__main__":
